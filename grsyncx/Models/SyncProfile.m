@@ -14,11 +14,26 @@
 
 #pragma mark - Initializers
 
+- (instancetype)duplicate
+{
+	SyncProfile *copy = [SyncProfile new];
+
+	copy.UUID = [NSUUID UUID];
+	copy.name = _name;
+	copy.sourcePath = _sourcePath;
+	copy.destinationPath = _destinationPath;
+	copy.wrapInSourceFolder = _wrapInSourceFolder;
+	copy.basicProperties = _basicProperties;
+	copy.advancedProperties = _advancedProperties;
+	copy.additionalOptions = _additionalOptions;
+
+	return copy;
+}
+
 + (instancetype)defaultProfile
 {
 	SyncProfile *def = [SyncProfile new];
 
-	def.sourcePath = @"~";
 	def.wrapInSourceFolder = YES;
 
 	def.basicProperties =
@@ -35,13 +50,13 @@
 
 - (instancetype)initFromDictionary:(NSDictionary *)dict
 {
+	NSString *uuid = dict.unx_parsable[@"UUID"].string;
 	NSString *name = dict.unx_parsable[@"Name"].string;
-
-	if (!name) return nil;
 
 	if (self = [super init])
 	{
-		_name = name;
+		if (uuid) _UUID = [[NSUUID alloc] initWithUUIDString:uuid];
+		if (name) _name = name;
 		_sourcePath = dict.unx_parsable[@"Source"].string;
 		_destinationPath = dict.unx_parsable[@"Destination"].string;
 		_wrapInSourceFolder = dict.unx_parsable[@"WrapInSrcFolder"].number.boolValue;
@@ -57,30 +72,42 @@
 {
 	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:8];
 
-	dict[@"Name"] = self.name;
+	id obj = nil;
 
-	id obj = _sourcePath;
-	if (obj) dict[@"Source"] = obj;
+	if ((obj = [_UUID UUIDString]))
+		dict[@"UUID"] = obj;
+	if ((obj = _name))
+		dict[@"Name"] = obj;
 
-	obj = _destinationPath;
-	if (obj) dict[@"Destination"] = obj;
+	if ((obj = _sourcePath))
+		dict[@"Source"] = obj;
+
+	if ((obj = _destinationPath))
+		dict[@"Destination"] = obj;
 
 	dict[@"WrapInSrcFolder"] = @(_wrapInSourceFolder);
 
 	dict[@"BasicProps"] = @(_basicProperties);
 	dict[@"AdvProps"] = @(_advancedProperties);
 
-	obj = _additionalOptions;
-	if (obj) dict[@"CustomOpts"] = obj;
+	if ((obj = _additionalOptions))
+		dict[@"CustomOpts"] = obj;
 
 	return [dict copy];
 }
 
 #pragma mark - Getters
 
-- (NSString *)name
+- (NSString *)displayableName
 {
-	return _name ?: NSLocalizedString(@"default", @"Default sync profile name");
+	NSString *name = _name;
+
+	if (!name)
+		name = (_UUID) ?
+			NSLocalizedString(@"Unnamed", @"Default sync profile name"):
+			NSLocalizedString(@"Default", @"Default sync profile name");
+
+	return name;
 }
 
 - (NSString *)calculatedSourcePath

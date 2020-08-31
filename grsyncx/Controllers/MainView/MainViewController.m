@@ -163,7 +163,7 @@
 
 - (SyncProfile *)syncProfileForCurrentValues
 {
-	SyncProfile *prof = [SyncProfile new];
+	SyncProfile *prof = [SyncProfile defaultProfile];
 
 	NSURL *srcURL = _sourcePathCtrl.pathItems.lastObject.URL;
 	NSURL *dstURL = _destinationPathCtrl.pathItems.lastObject.URL;

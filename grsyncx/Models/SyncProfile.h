@@ -86,7 +86,13 @@ typedef NS_OPTIONS(NSUInteger, RSyncAdvancedProp) {
 
 #pragma mark Properties
 
-@property (nonatomic, copy) NSString *name;
+- (instancetype)init UNAVAILABLE_ATTRIBUTE;
++ (instancetype)new  UNAVAILABLE_ATTRIBUTE;
+
+// Default profile has no UUID and no name. 👍
+
+@property (nonatomic, copy, nullable) NSUUID *UUID;
+@property (nonatomic, copy, nullable) NSString *name;
 
 @property (nonatomic, copy, nullable) NSString *sourcePath;
 @property (nonatomic, copy, nullable) NSString *destinationPath;
@@ -105,6 +111,7 @@ typedef NS_OPTIONS(NSUInteger, RSyncAdvancedProp) {
 
 #pragma mark Methods
 
+@property (nonatomic, copy, readonly) NSString *displayableName;
 @property (nonatomic, copy, readonly, nullable) NSString *calculatedSourcePath;
 @property (nonatomic, copy, readonly, nullable) NSString *calculatedDestinationPath;
 @property (nonatomic, copy, readonly, nullable) NSArray<NSString *> *calculatedArguments;

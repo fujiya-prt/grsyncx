@@ -35,8 +35,11 @@
 	{
 		_defaults = [NSUserDefaults standardUserDefaults];
 
-		NSDictionary *lastProfile = [_defaults dictionaryForKey:@SETTINGS_KEY_LAST_USED_PROFILE];
-		_lastUsedProfile = [[SyncProfile alloc] initFromDictionary:lastProfile] ?: [SyncProfile defaultProfile];
+		NSDictionary *lastProfileDict = [_defaults dictionaryForKey:@SETTINGS_KEY_LAST_USED_PROFILE];
+		SyncProfile *lastProfile = nil;
+		if (lastProfileDict) lastProfile = [[SyncProfile alloc] initFromDictionary:lastProfileDict];
+		if (!lastProfile) lastProfile = [SyncProfile defaultProfile];
+		_lastUsedProfile = lastProfile;
 
 		[[NSNotificationCenter defaultCenter] addObserver:self
 			selector:@selector(appWillTerminateNotification)
